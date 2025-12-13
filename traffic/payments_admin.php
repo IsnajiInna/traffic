@@ -16,6 +16,17 @@ if (isset($_POST['mark_paid'])) {
     }
 }
 
+// ✅ Mark violation as Unpaid
+if (isset($_POST['mark_unpaid'])) {
+    $id = (int)$_POST['violation_id'];
+    $sql = "UPDATE violations SET status='Unpaid' WHERE id=$id";
+    if ($conn->query($sql)) {
+        $message = "Status changed back to UNPAID!";
+    } else {
+        $message = "Error: " . $conn->error;
+    }
+}
+
 // ✅ Fetch ALL violations (paid or unpaid)
 $sql = "SELECT v.*, u.full_name, u.license_plate, o.code, o.description 
         FROM violations v
@@ -30,7 +41,7 @@ $result = $conn->query($sql);
 <head>
 <meta charset="UTF-8">
 <title>Admin Payments</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="styles.css">
 
 <style>
 .search-box { width: 300px; margin-bottom: 10px; }
@@ -42,14 +53,20 @@ $result = $conn->query($sql);
 
 <body>
 <div class="sidebar">
-    <h2>City Dashboard</h2>
-    <a href="dashboard.php">Dashboard</a>
-    <a href="ordinances.php">Ordinances</a>
-    <a href="violations.php">Violations</a>
-    <a href="payments_admin.php" class="active">Payments</a>
-    <a href="reports.php">Reports</a>
-    <a href="logout.php">Logout</a>
+    <h2>Admin Panel</h2>
+
+    <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">Dashboard</a>
+    <a href="violations.php" class="<?= basename($_SERVER['PHP_SELF']) == 'violations.php' ? 'active' : '' ?>">Violations</a>
+    <a href="ordinances.php" class="<?= basename($_SERVER['PHP_SELF']) == 'ordinances.php' ? 'active' : '' ?>">Ordinances</a>
+    <a href="notification.php" class="<?= basename($_SERVER['PHP_SELF']) == 'notification.php' ? 'active' : '' ?>">Notification</a>
+    <a href="search.php" class="<?= basename($_SERVER['PHP_SELF']) == 'search.php' ? 'active' : '' ?>">Search</a>
+    <a href="reports.php" class="<?= basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'active' : '' ?>">Reports</a>
+    <a href="payments_admin.php" class="<?= basename($_SERVER['PHP_SELF']) == 'payments_admin.php' ? 'active' : '' ?>">Payments</a>
+
+
+    <a href="logout.php" onclick="return confirm('Are you sure you want to logout?');" class="logout-btn">Logout</a>
 </div>
+
 
 <div class="main-content">
     <h1>Payment Management (Admin)</h1>
@@ -93,7 +110,10 @@ $result = $conn->query($sql);
                                 <button name="mark_paid" class="btn">Mark as Paid</button>
                             </form>
                         <?php } else { ?>
-                            ✅ Paid
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="violation_id" value="<?= $row['id']; ?>">
+                                <button name="mark_unpaid" class="btn">Mark Unpaid</button>
+                            </form>
                         <?php } ?>
                     </td>
                 </tr>
