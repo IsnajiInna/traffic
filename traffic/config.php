@@ -1,5 +1,7 @@
 <?php
-session_start();  
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 $servername = "localhost";
 $username = "root";  
@@ -12,13 +14,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-
-function isLoggedIn() {
-    return isset($_SESSION['user_id']);
+// Prevent redeclaration
+if (!function_exists('isLoggedIn')) {
+    function isLoggedIn() {
+        return isset($_SESSION['user_id']);
+    }
 }
 
-
-function isAdmin() {
-    return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+if (!function_exists('isAdmin')) {
+    function isAdmin() {
+        return isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+    }
 }
 ?>
